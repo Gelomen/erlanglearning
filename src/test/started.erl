@@ -82,7 +82,7 @@ heh_fine() ->
 
 oh_god(X) ->
   if X =:= 2 -> might_succeed;
-    true -> always_does  %% 这三 Erlang 的 else
+    true -> always_does  %% 这是 Erlang 的 else
   end.
 
 help_me(Animail) ->
@@ -98,10 +98,10 @@ help_me(Animail) ->
 insert(X, []) ->
   [X];
 
-insert(X, Set) ->
-  case lists:member(X, Set) of
-    true -> Set;
-    false -> [X | Set]
+insert(X, List) ->
+  case lists:member(X, List) of
+    true -> List;
+    false -> [X | List]
   end.
 
 beach(Temp) ->
