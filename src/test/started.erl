@@ -24,10 +24,10 @@ add_to_one(X) ->
   hello(),
   add(X, 2).
 
-say(mail, X) ->
+say(male, X) ->
   io:format("Hi! Mr.~s", [X]);
 
-say(femail, X) ->
+say(female, X) ->
   io:format("Hi! Mrs.~s", [X]);
 
 say(X, Y) ->
