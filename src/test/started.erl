@@ -230,7 +230,7 @@ quick_sort([X | Y]) ->
 partition(_, [], Smaller, Larger) -> {Smaller, Larger};
 partition(X, [H | T], Smaller, Larger) ->
   if H =< X -> partition(X, T, [H | Smaller], Larger);
-    H > X -> partition(X, T, Smaller, [H | Larger])
+     H > X -> partition(X, T, Smaller, [H | Larger])
   end.
 
 
