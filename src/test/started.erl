@@ -224,9 +224,9 @@ tail_lenient_zip([X | Xx], [Y | Yy], List) -> tail_lenient_zip(Xx, Yy, [{X, Y} |
 % 快速排序列表  教学例子而已，列表排序用 lists:sort/1
 quick_sort([]) -> [];
 quick_sort([X | Y]) ->
-  {Smaller, Larger} = partition(X, Y, [], []),    % partition/4 将列表分割成大小两部分，然后存入元组 {Smaller, Larger}
+  {Smaller, Larger} = partition(X, Y, [], []),
   quick_sort(Smaller) ++ [X] ++ quick_sort(Larger).
-
+% partition/4 将列表分割成大小两部分，然后存入元组 {Smaller, Larger}
 partition(_, [], Smaller, Larger) -> {Smaller, Larger};
 partition(X, [H | T], Smaller, Larger) ->
   if H =< X -> partition(X, T, [H | Smaller], Larger);
