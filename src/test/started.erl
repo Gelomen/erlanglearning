@@ -8,6 +8,7 @@
 %%-------------------------------------------------------------------
 -module(started).
 -author("gelomenchen").
+-define(sub(X, Y), X - Y).
 
 % API
 -export([add/2, hello/0, add_to_one/1, say/2, for/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
@@ -19,7 +20,8 @@
 add(X, Y) -> X + Y.
 
 hello() ->
-  io:format("Hello ~n").
+  io:format("Hello ~n"),
+  ?sub(1, 2).
 
 add_to_one(X) ->
   hello(),
