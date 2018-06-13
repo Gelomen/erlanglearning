@@ -11,7 +11,7 @@
 
 %% API
 -export([add/2, hello/0, add_to_one/1, say/2, for/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
-  what_am_i/1, fac/1, len/1, tail_fac/1, tail_len/1, duplicate/2, tail_duplicate/2, reverse/1, tail_reverse/1, sublist/2, tail_sublist/2, zip/2, tail_zip/2, lenient_zip/2]).
+  what_am_i/1, fac/1, len/1, tail_fac/1, tail_len/1, duplicate/2, tail_duplicate/2, reverse/1, tail_reverse/1, sublist/2, tail_sublist/2, zip/2, tail_zip/2, lenient_zip/2, tail_lenient_zip/2]).
 
 
 %% ============================== get started ==============================
@@ -199,9 +199,9 @@ tail_sublist([X | Y], N, List) when N > 0 -> tail_sublist(Y, N - 1, [X | List]).
 zip([], []) -> [];
 zip([X | Xx], [Y | Yy]) -> [{X, Y} | zip(Xx, Yy)].
 %% tail
+tail_zip([], []) -> [];
 tail_zip([X | Xx], [Y | Yy]) -> lists:reverse(tail_zip([X | Xx], [Y | Yy], [])).
-tail_zip([], _, List) -> List;
-tail_zip(_, [], List) -> List;
+tail_zip([], [], List) -> List;
 tail_zip([X | Xx], [Y | Yy], List) -> tail_zip(Xx, Yy, [{X, Y} | List]).
 
 %% --------
@@ -209,6 +209,14 @@ tail_zip([X | Xx], [Y | Yy], List) -> tail_zip(Xx, Yy, [{X, Y} | List]).
 lenient_zip([], _) -> [];
 lenient_zip(_, []) -> [];
 lenient_zip([X | Xx], [Y | Yy]) -> [{X,Y} | lenient_zip(Xx, Yy)].
+
+%% tail
+tail_lenient_zip([], _) -> [];
+tail_lenient_zip(_, []) -> [];
+tail_lenient_zip([X | Xx], [Y | Yy]) -> lists:reverse(tail_lenient_zip([X | Xx], [Y | Yy], [])).
+tail_lenient_zip([], _, List) -> List;
+tail_lenient_zip(_, [], List) -> List;
+tail_lenient_zip([X | Xx], [Y | Yy], List) -> tail_lenient_zip(Xx, Yy, [{X, Y} | List]).
 
 
 
