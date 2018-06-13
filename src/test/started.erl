@@ -11,7 +11,7 @@
 -define(sub(X, Y), X - Y).
 
 % API
--export([add/2, hello/0, add_to_one/1, my_test_func/0, say/2, for/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
+-export([add/2, hello/0, add_to_one/1, say/2, for/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
   what_am_i/1, fac/1, len/1, tail_fac/1, tail_len/1, duplicate/2, tail_duplicate/2, reverse/1, tail_reverse/1, sublist/2, tail_sublist/2, zip/2, tail_zip/2, lenient_zip/2, tail_lenient_zip/2,
   quick_sort/1]).
 
