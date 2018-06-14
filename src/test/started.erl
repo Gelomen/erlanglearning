@@ -345,7 +345,16 @@ old_man([{male, Age} | Others], Acc) when Age > 60 ->
 old_man([_ | Others], Acc) ->
   old_man(Others, Acc).
 
+% 对以上两个函数进行抽象
 
+filter(Fun, L) -> lists:reverse(filter(Fun, L, [])).
+
+filter(_, [], Acc) -> Acc;
+filter(Fun, [H | T], Acc) ->
+  case Fun(H) of
+    true -> filter(Fun, T, [H | Acc]);
+    false -> filter(Fun, T, Acc)
+  end.
 
 
 
