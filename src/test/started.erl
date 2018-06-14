@@ -13,7 +13,7 @@
 % API
 -export([add/2, hello/0, add_to_one/1, say/2, forM/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
   what_am_i/1, fac/1, len/1, tail_fac/1, tail_len/1, duplicate/2, tail_duplicate/2, reverse/1, tail_reverse/1, sublist/2, tail_sublist/2, zip/2, tail_zip/2, lenient_zip/2, tail_lenient_zip/2,
-  quick_sort/1]).
+  quick_sort/1, empty/0, insert/3, lookup/2]).
 
 
 % ============================== get started ==============================
@@ -248,7 +248,28 @@ partition(X, [H | T], Smaller, Larger) ->
      H > X -> partition(X, T, Smaller, [H | Larger])
   end.
 
+% ----------------------------------------------
 
+% 树，元组包含一个健、一个键值，还有另外两个结点，其中一个结点比包含它的结点的健大，另一个比包含它的结点的健小
+% 空结点也是树的根结点(root)
+empty() -> {node, "nil"}.
 
+% 添加结点
+insert(Key, Val, {node, "nil"}) ->
+  {node, {Key, Val, {node, "nil"}, {node, "nil"}}};
+insert(NewKey, NewVal, {node, {Key, Val, Smaller, Larger}}) when NewKey < Key ->
+  {node, {Key, Val, insert(NewKey, NewVal, Smaller), Larger}};
+insert(NewKey, NewVal, {node, {Key, Val, Smaller, Larger}}) when NewKey > Key ->
+  {node, {Key, Val, Smaller, insert(NewKey, NewVal, Larger)}};
+insert(Key, Val, {node, {Key, _, Smaller, Larger}}) ->
+  {node, {Key, Val, Smaller, Larger}}.
 
-
+% 查询结点
+lookup(_, {node, "nil"}) ->
+  undefined;
+lookup(Key, {node, {Key, Val, _, _}}) ->
+  {ok, Val};
+lookup(Key, {node, {NodeKey, _, Smaller, _}}) when Key < NodeKey ->
+  lookup(Key, Smaller);
+lookup(Key, {node, {_, _, _, Larger}}) ->
+  lookup(Key, Larger).
