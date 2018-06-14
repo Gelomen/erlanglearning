@@ -9,11 +9,10 @@
 -module(started).
 -author("gelomenchen").
 -define(sub(X, Y), X - Y).
+-compile([export_all]).
 
 % API
--export([add/2, hello/0, add_to_one/1, say/2, forM/0, head/1, second/1, same/2, valid_time/1, old_enough/1, wrong_age/1, heh_fine/0, oh_god/1, help_me/1, insert/2, beach/1, guards_beach/1,
-  what_am_i/1, fac/1, len/1, tail_fac/1, tail_len/1, duplicate/2, tail_duplicate/2, reverse/1, tail_reverse/1, sublist/2, tail_sublist/2, zip/2, tail_zip/2, lenient_zip/2, tail_lenient_zip/2,
-  quick_sort/1, empty/0, insert/3, lookup/2]).
+-export([add/2, hello/0, add_to_one/1]).
 
 
 % ============================== get started ==============================
@@ -273,3 +272,92 @@ lookup(Key, {node, {NodeKey, _, Smaller, _}}) when Key < NodeKey ->
   lookup(Key, Smaller);
 lookup(Key, {node, {_, _, _, Larger}}) ->
   lookup(Key, Larger).
+
+
+% ============================== 高阶函数 ==============================
+
+% 但这种方式需要把函数都放在同一个模块中，还要导出，然后编译后才能用，不太实用
+map(_, []) -> [];
+map(F, [H | T]) -> [F(H) | map(F, T)].
+
+incr(X) -> X + 1.
+decr(X) -> X - 1.
+
+
+% =========== 匿名函数
+
+% 函数内的所有变量及其值都是该函数作用域的一部分，比如 `base(A) -> B = A + 1.`
+% 函数 `base/1` 中任何地方都可以引用 `A` 和 `B`，甚至匿名函数也可以调用它们
+base(A) ->
+  B = A + 1,
+  F = fun() -> A * B end,
+  F().
+
+% 但继承是单向的，在匿名函数里定义变量 `C`，在匿名函数外调用 `C`，这样是错误的
+% 编译会直接报错
+%%base2(A) ->
+%%  B = A + 1,
+%%  F = fun() -> C = A * B end,
+%%  F(),
+%%  C.
+
+
+% 不管匿名函数在哪，被继承的作用域会一直跟着它，即使把这个匿名函数传递给另外一个函数
+
+a()->
+  Secret = "pony",
+  fun() -> Secret end.
+
+b(F) ->
+  "a/0's password is " ++ F().
+
+% ============ 重新定义变量
+
+% 这个运行肯定失败，因为变量 A = 1，不能再赋值
+base2() ->
+  A = 1,
+  (fun() -> A = 2 end)().
+
+% 这种写法是合法的，编译时会有 warning 提示定义了一个与父作用域某个变量同名的新名字
+% 出现这个提示，可以考虑对变量进行重命名
+base3() ->
+  A = 1,
+  (fun(A) -> A = 2 end)(2).
+
+
+% ============ 过滤器
+
+% 找出列表元素的所有偶数
+even(L) -> lists:reverse(even(L, [])).
+
+even([], Acc) -> Acc;
+even([H | T], Acc) when H rem 2 =:= 0 ->
+  even(T, [H | Acc]);
+even([_| T] , Acc) ->
+  even(T, Acc).
+
+% 只保留年龄大于60的男性
+old_man(L) -> lists:reverse(old_man(L, [])).
+
+old_man([], Acc) -> Acc;
+old_man([{male, Age} | Others], Acc) when Age > 60 ->
+  old_man(Others, [{male, Age} | Acc]);
+old_man([_ | Others], Acc) ->
+  old_man(Others, Acc).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
