@@ -9,7 +9,7 @@
 -module(started).
 -author("gelomenchen").
 -define(sub(X, Y), X - Y).
--compile([export_all]).
+-compile([export_all]).   % 只为调试方便
 
 % API
 -export([add/2, hello/0, add_to_one/1]).
@@ -356,10 +356,32 @@ filter(Fun, [H | T], Acc) ->
     false -> filter(Fun, T, Acc)
   end.
 
+% ============ 折叠
 
+% 找出列表中的最大值
+max([H|T]) -> max2(T, H).
 
+max2([], Max) -> Max;
+max2([H | T], Max) when H > Max -> max2(T, H);
+max2([_ | T], Max) -> max2(T, Max).
 
+% 找出列表中的最小值
+min([H | T]) -> min2(T, H).
 
+min2([], Max) -> Max;
+min2([H | T], Max) when H < Max -> min2(T, H);
+min2([_ | T], Max) -> min2(T, Max).
+
+% 计算列表所有元素的和
+
+sum(L) -> sum2(L, 0).
+sum2([], Sum) -> Sum;
+sum2([H | T], Sum) -> sum2(T, H + Sum).
+
+% 根据上面三个函数构建一个抽象
+
+fold(_, Start, []) -> Start;
+fold(Fun, Start, [H | T]) -> fold(Fun, Fun(H, Start), T).
 
 
 
