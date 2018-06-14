@@ -153,7 +153,7 @@ what_am_i(X) when is_binary(X) ->
 what_am_i(X) when is_float(X) ->
   X;
 what_am_i(_) ->
-  "You are nothon! ~n".
+  "You are nothing! ~n".
 
 
 % ============================== 递归函数 ==============================
