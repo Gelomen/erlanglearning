@@ -448,6 +448,50 @@ whoa() ->
       Exception: Reason -> {caught, Exception, Reason}
   end.
 
+% ==== catch 常常会被写成如下方式
+
+catcher(X, Y) ->
+  case catch X / Y of
+    {'EXIT', {badarith, _}} -> "uh oh";
+    N -> N
+  end.
+
+
+% 在 catch 中使用 throw/1 也会造成问题，都是返回 return
+one_or_two(1) -> return;
+one_or_two(2) -> throw(return).
+
+
+% =============== 用之前的 二叉树 做练习
+
+% 在树中查找给定的 Val
+%has_value(_, {node, 'nil'}) -> false;
+%has_value(Val, {node, {_, Val, _, _}}) -> true;
+%has_value(Val, {node, {_, _, Left, Right}}) ->
+%  case has_value(Val, Left) of
+%    true -> true;
+%    false -> has_value(Val, Right)
+%  end.
+
+
+
+
+% 有个缺点，对于树的每个节点，都要对前一个节点进行检查，可以使用 throw 直接抛出
+has_value(Val, Tree) ->
+  try has_value1(Val, Tree) of
+    false -> false
+  catch
+    true -> true
+  end.
+
+has_value1(_, {node, 'nil'}) -> false;
+has_value1(Val, {node, {_, Val, _, _}}) ->
+  throw(true);
+has_value1(Val, {node, {_, _, Left, Right}}) ->
+  has_value1(Val, Left),
+  has_value1(Val, Right).
+
+
 
 
 
