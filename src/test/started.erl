@@ -9,7 +9,7 @@
 -module(started).
 -author("gelomenchen").
 -define(sub(X, Y), X - Y).
--compile([export_all]).   % 只为调试方便
+-compile([debug_info, export_all]).   % 只为调试方便
 
 % API
 -export([add/2, hello/0, add_to_one/1]).
@@ -496,6 +496,77 @@ has_value1(Val, {node, {_, _, Left, Right}}) ->
 
 
 % ============================== 用函数式思维解决问题 ==============================
+
+
+% RPN 计算器
+
+rpn(L) when is_list(L) ->
+  [Res] = lists:foldl(fun rpn/2, [], string:tokens(L, " ")),
+  Res.
+
+read(N) ->
+%%  例子本身有问题，没有考虑读取到运算符号后，list_to_integer/1 会报错
+%%  case string:to_float(N) of
+%%    {error, no_float} -> list_to_integer(N);
+%%    {F, _} -> F
+%%  end.
+  case string:to_float(N) of
+    {error, no_float} ->
+      try
+        list_to_integer(N)
+      catch
+        error: _ -> N
+      end;
+    {F, _} -> F
+  end.
+
+
+rpn("+", [N1, N2 | T]) -> [N2 + N1 | T];
+rpn("-", [N1, N2 | T]) -> [N2 - N1 | T];
+rpn("*", [N1, N2 | T]) -> [N2 * N1 | T];
+rpn("/", [N1, N2 | T]) -> [N2 / N1 | T];
+rpn("^", [N1, N2 | T]) -> [math:pow(N2, N1) | T];
+rpn("ln", [N | T]) -> [math:log(N) | T];
+rpn("log10", [N | T]) -> [math:log10(N) | T];
+rpn(X, Start) -> [read(X) | Start].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
