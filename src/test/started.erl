@@ -528,6 +528,10 @@ rpn("/", [N1, N2 | T]) -> [N2 / N1 | T];
 rpn("^", [N1, N2 | T]) -> [math:pow(N2, N1) | T];
 rpn("ln", [N | T]) -> [math:log(N) | T];
 rpn("log10", [N | T]) -> [math:log10(N) | T];
+rpn("sum", [H | []]) -> [H];
+rpn("sum", [N1, N2 | T]) -> rpn("sum", [N1 + N2 | T]);
+rpn("prod", [H | []]) -> [H];
+rpn("prod", [N1, N2 | T]) -> rpn("prod", [N1 * N2 | T]);
 rpn(X, Start) -> [read(X) | Start].
 
 
