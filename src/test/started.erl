@@ -642,14 +642,42 @@ repairman(Rob) ->
 % 共享记录定义
 included() -> #included{some_field="Some value"}.
 
+% ============================== 并发编程 ==============================
 
+% 接收消息
+dolphin1() ->
+  receive
+    do_a_flip ->
+      io:format("How about no? ~n");
+    fish ->
+      io:format("So long and thanks ofr all the fish! ~n");
+    _ ->
+      io:format("Heh, We're smarter than you humans. ~n")
+  end.
 
+% 增加参数 From，以方便看出来消息是发给谁
+dolphin2() ->
+  receive
+    {From, do_a_flip} ->
+      From ! "How about no?";
+    {From, fish} ->
+      From ! "So long and thanks for all the fish!";
+    _ ->
+      io:format("Heh, we're smarter than you humans.~n")
+end.
 
-
-
-
-
-
+% 使用递归让进程不会结束
+dolphin3() ->
+  receive
+    {From, do_a_flip} ->
+      From ! "How about no? ~n",
+      dolphin3();
+    {From, fish} ->
+      From ! "So long and thanks for all the fish!";
+    _ ->
+      io:format("Heh, we're smarter than you humans.~n"),
+      dolphin3()
+  end.
 
 
 
