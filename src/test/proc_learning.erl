@@ -69,7 +69,16 @@ take_delay(Pid, Food) ->
     timeout
   end.
 
+sleep(T) ->
+  receive
+  after T -> ok
+  end.
 
+flush() ->
+  receive
+    _ -> flush()
+  after 0 -> ok
+  end.
 
 
 
