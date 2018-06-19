@@ -559,7 +559,7 @@ rpn_test() ->
 % 解决找出最短路径
 
 main() ->
-   File = "road.txt",
+  File = "road.txt",
   {ok, Bin} = file:read_file(File),
   optimal_path(parse_map(Bin)).
 
@@ -588,7 +588,13 @@ optimal_path(Map) ->
                   end,
   lists:reverse(Path).
 
+% 不使用 erlang shell 运行程序
 
+main([FileName]) ->
+  {ok, Bin} = file:read_file([FileName]),
+  Map = parse_map(Bin),
+  io:format("~p~n", [optimal_path(Map)]),
+  erlang:halt().
 
 
 
