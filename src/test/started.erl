@@ -10,6 +10,12 @@
 -author("gelomenchen").
 -define(sub(X, Y), X - Y).
 -compile([debug_info, export_all]).   % 只为调试方便
+-record(robot, {name,
+                type=industrial,
+                hobbies,
+                details=[]}).
+-record(user, {id, name, group, age}).
+-include("records.hrl").
 
 % API
 -export([add/2, hello/0, add_to_one/1]).
@@ -598,16 +604,43 @@ main([FileName]) ->
 
 
 
+% ============================== 常用数据结构 ==============================
+
+% record 记录
+
+first_record() ->
+  #robot{name = "Mechatron",
+         type = handmade,
+         details = ["Moved by a samll man inside."]}.
+
+car_factory(CorpName) ->
+  #robot{name = CorpName,
+         type = industral,
+         hobbies = "building cars", details = []}.
+
+% 使用模式匹配进行过滤
+admin_panel(#user{name=Name, group=admin}) ->
+  Name ++ " is allowed!";
+admin_panel(#user{name=Name}) ->
+  Name ++ " is not allowed".
+
+% 可以随意扩展 user 记录，函数无需修改
+adult_section(U = #user{}) when U#user.age >= 18 ->
+  % 显示不适合写出来的内容
+  allowed;
+adult_section(_) ->
+  % 重定向到 Sesame Street 教育网站
+  forbidden.
+
+% 更新记录
+repairman(Rob) ->
+  Details = Rob#robot.details,
+  NewRob = Rob#robot{details=["Repaired by repairman"|Details]},
+  {repaired, NewRob}.
 
 
-
-
-
-
-
-
-
-
+% 共享记录定义
+included() -> #included{some_field="Some value"}.
 
 
 
