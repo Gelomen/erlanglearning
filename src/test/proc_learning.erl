@@ -76,8 +76,8 @@ sleep(T) ->
 
 flush() ->
   receive
-    _ -> flush()
-  after 0 -> ok
+    X -> [X|flush()]
+  after 0 -> []
   end.
 
 
