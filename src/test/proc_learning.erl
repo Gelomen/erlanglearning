@@ -123,10 +123,64 @@ chain(N) ->
     _ -> ok
   end.
 
+% ===== 命名进程
 
+start_critic() ->
+  spawn(?MODULE, critic, []).
 
+judge(Pid, Band, Album) ->
+  Pid ! {self(), {Band, Album}},
+  receive
+    {Pid, Criticism} -> Criticism
+  after 2000 ->
+    timeout
+  end.
 
+critic() ->
+  receive
+    {From, {"A", "B"}} ->
+      From ! {self(), "AB"};
+    {From, {"C", "D"}} ->
+      From ! {self(), "CD"};
+    {From, {"E", "F"}} ->
+      From ! {self(), "EF"};
+    {From, {_Band, _Album}} ->
+      From ! {self(), "bla bla bla"}
+  end,
+  critic().
 
+% 让 critic 自动复活
+start_critic_reborn() ->
+  spawn(?MODULE, reborn, []).
 
+reborn() ->
+  process_flag(trap_exit, true),
+  Pid = spawn_link(?MODULE, critic_ref, []),
+  register(critic, Pid),
+  receive
+    {'EXIT', Pid, normal} -> ok;
+    {'EXIT', Pid, shutdown} -> ok;
+    {'EXIT', Pid, _} -> reborn()
+  end.
 
+judge(Band, Album) ->
+  Ref = make_ref(),
+  critic ! {self(), Ref, {Band, Album}},
+  receive
+    {Ref, Criticism} -> Criticism
+  after 2000 ->
+    timeout
+  end.
 
+critic_ref() ->
+  receive
+    {From, Ref, {"A", "B"}} ->
+      From ! {Ref, "AB"};
+    {From, Ref, {"C", "D"}} ->
+      From ! {Ref, "CD"};
+    {From, Ref, {"E", "F"}} ->
+      From ! {Ref, "EF"};
+    {From, Ref, {_Band, _Album}} ->
+      From ! {Ref, "bla bla bla"}
+  end,
+  critic_ref().
