@@ -590,7 +590,7 @@ shortest_step({A, B, X}, {{DistA, PathA}, {DistB, PathB}}) ->
 optimal_path(Map) ->
   {A, B} = lists:foldl(fun shortest_step/2, {{0, []}, {0, []}}, Map),
   {_Dist, Path} = if hd(element(2, A)) =/= {x, 0} -> A;
-                     hd(element(2, B)) =/= {x, 0} -> A
+                     hd(element(2, B)) =/= {x, 0} -> B
                   end,
   lists:reverse(Path).
 
