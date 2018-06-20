@@ -74,20 +74,54 @@ sleep(T) ->
   after T -> ok
   end.
 
+% 获取当前进程所有信息，并加入到列表
 flush() ->
   receive
     X -> [X|flush()]
   after 0 -> []
   end.
 
+% 按等级加入信息
+important() ->
+  receive
+    {Priority, Msg} when  Priority > 10 ->
+      [Msg | important()]
+  after 0 ->
+    normal()
+  end.
+
+normal() ->
+  receive
+    {_, Msg} ->
+      [Msg | normal()]
+  after 0 ->
+    []
+  end.
 
 
 
+% ============================== 错误与进程 ==============================
 
+% ===== 链接
 
+my_proc() ->
+  timer:sleep(5000),
+  exit(reason).
 
+% ===== 大型进程组
 
-
+chain(0) ->
+  receive
+    _ -> ok
+  after 2000 ->
+    exit("chain dies here")
+  end;
+chain(N) ->
+  Pid = spawn(fun() -> chain(N - 1) end),
+  link(Pid),
+  receive
+    _ -> ok
+  end.
 
 
 
