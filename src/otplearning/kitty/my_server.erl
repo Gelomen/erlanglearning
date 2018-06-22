@@ -26,7 +26,7 @@ call(Pid, Msg) ->
 	Pid ! {sync, self(), Ref, Msg},
 	receive
 		{Ref, Reply} ->
-			erlang:demonitor(Pid, [flush]),
+			erlang:demonitor(Ref, [flush]),
 			Reply;
 		{'DOWN', Ref, process, pid, Reason} ->
 			erlang:error(Reason)
