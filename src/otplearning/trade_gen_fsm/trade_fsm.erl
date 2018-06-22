@@ -122,7 +122,7 @@ notice(#state{name = N}, Str, Args) ->
 unexpected(Msg, State) ->
 	io:format("~p received unknown event ~p while in state ~p~n", [self(), Msg, State]).
 
-%% 处理异步版本的函数
+%% 实现异步版本的函数
 idle({ask_negotiate, OtherPid}, S = #state{}) ->
 	Ref = erlang:monitor(process, OtherPid),
 	notice(S, "~p asked for a trade negotiation", [OtherPid]),
@@ -131,11 +131,57 @@ idle(Event, Data) ->
 	unexpected(Event, idle),
 	{next_state, idle, Data}.
 
+%% 本方玩家请求 FSM 联系另一个玩家进行交易
+idle({negotiate, OtherPid}, From, S=#state{}) ->
+	ask_negotiate(OtherPid, self()),
+	notice(S, "asking user ~p for a trade", [OtherPid]),
+	Ref = monitor(process, OtherPid),
+	{next_state, idle_wait, S#state{other = OtherPid, monitor = Ref, from = From}};
+idle(Event, _From, Data) ->
+	unexpected(Event, idle),
+	{next_state, idle, Data}.
 
+idle_wait({ask_negotiate, OtherPid}, S = #state{other = OtherPid}) ->
+	gen_fsm:reply(S#state.from, ok),
+	notice(S, "starting negotiation", []),
+	{next_state, negotiation, S};
+%% 对方接受了我们的请求，迁移到 negotiate 状态
+idle_wait({accept_negotiate, OtherPid}, S = #state{other = OtherPid}) ->
+	gen_fsm:reply(S#state.from, ok),
+	notice(S, "starting negotiation", []),
+	{next_state, negotiate, S};
+idle_wait(Event, Data) ->
+	unexpected(Event, idle_wait),
+	{next_state, idle_wait, Data}.
 
+idle_wait(accept_negotiate, _From, S = #state{other = OtherPid}) ->
+	accept_negotiate(OtherPid, self()),
+	notice(S, "accepting nogetiation", []),
+	{reply, ok, negotiate, S};
+idle_wait(Event, _From, Data) ->
+	unexpected(Event, idle_wait),
+	{next_state, idle_wait, Data}.
 
-
-
+%% 实现提供和移除物品功能
+negotiate({make_offer, Item}, S = #state{ownitems = OwnItems}) ->
+	do_offer(S#state.other, Item),
+	notice(S, "offering ~p", [Item]),
+	{next_state, negotiate, S#state{ownitems = add(Item, OwnItems)}};
+negotiate({retract_offer, Item}, S = #state{ownitems = OwnItems}) ->
+	undo_offer(S#state.other, Item),
+	notice(S, "cancelling offer on ~p", [Item]),
+	{next_state, negotiate, S#state{ownitems = remove(Item, OwnItems)}};
+negotiate({do_offer, Item}, S = #state{ownitems = OtherItems}) ->
+	notice(S, "other player offering ~p", [Item]),
+	{next_state, negotiate, S#state{otheritems = add(Item, OtherItems)}};
+negotiate({undo_offer, Item}, S = #state{otheritems = OtherItems}) ->
+	notice(S, "Other player cancelling offer on ~p", [Item]),
+	{next_state, negotiate, S#state{otheritems = OtherItems}};
+negotiate(are_you_ready, S = #state{other = OtherPid}) ->
+	io:format("Other user ready to trade. ~n"),
+	notice(S,"Other user ready to transfer goods: ~n"
+	"You get ~p, The other side gets ~p",
+		[S#state.otheritems, S#state.ownitems]).
 
 
 
@@ -148,3 +194,12 @@ idle(Event, Data) ->
 %% ============================================================================
 %%                              内部 API
 %% ============================================================================
+
+
+%% 向物品列表增加一件物品
+add(Item, Items) ->
+	[Item | Items].
+
+%% 从物品列表移除一件物品
+remove(Item, Items) ->
+	Items -- [Item].
