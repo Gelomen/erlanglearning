@@ -22,16 +22,20 @@
 start_link() ->
 	gen_server:start_link(?MODULE, [], []).
 
+%% 同步调用
 order_cat(Pid, Name, Color, Description) ->
 	gen_server:call(Pid, {order, Name, Color, Description}).
 
+%% 异步调用
 return_cat(Pid, Cat = #cat{}) ->
 	gen_server:cast(Pid, {return, Cat}).
 
+%% 同步调用
 close_shop(Pid) ->
 	gen_server:call(Pid, terminate).
 
-init([]) -> {ok, []}.
+%% 服务器函数
+init([]) -> {ok, []}.   %% 此处无需做信息处理
 
 handle_call({order, Name, Color, Description}, _From, Cats) ->
 	if Cats =:= [] ->
@@ -49,6 +53,10 @@ handle_info(Msg, Cats) ->
 	io:format("Unexpected message: ~p~n", [Msg]),
 	{noreply, Cats}.
 
+terminate(normal, Cats) ->
+	[io:format("~p was set free. ~n", [C#cat.name]) || C <- Cats],
+	ok.
+
 code_change(_OldVsn, State, _Extra) ->
 	{ok, State}.
 
@@ -57,9 +65,6 @@ code_change(_OldVsn, State, _Extra) ->
 %%                              内部 API
 %% ============================================================================
 
-terminate(normal, Cats) ->
-	[io:format("~p was set free. ~n", [C#cat.name]) || C <- Cats],
-	ok.
-
+%%% 私有函数
 make_cat(Name, Col, Desc) ->
 	#cat{name = Name, color = Col, description = Desc}.
