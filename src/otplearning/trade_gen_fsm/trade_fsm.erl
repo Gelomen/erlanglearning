@@ -9,6 +9,7 @@
 -module(trade_fsm).
 -author("gelomenchen").
 -behavior(gen_fsm).
+-record(state, {name="", other, ownitems=[], otheritems=[], monitor, from}).
 
 %% API
 -export([]).
@@ -105,10 +106,30 @@ notify_cancel(OtherPid) ->
 
 
 
+%% ----------------- gen_fsm 回调函数 ---------------------
 
+%% init/1 函数只需要玩家名字，其实状态是 idle
+init(Name) ->
+	{ok, idle, #state{name = Name}}.
 
+%% 为了让我们知道一切运行正常，需要几个工具函数
+%% 给玩家发送一条通知，可以是一条发给玩家进程的消息
+%% 不过在此处，打印到 shell 上就足够了
+notice(#state{name = N}, Str, Args) ->
+	io:format("~s: " ++ Str ++ "~n", [N | Args]).
 
+%% 记录非期望的消息
+unexpected(Msg, State) ->
+	io:format("~p received unknown event ~p while in state ~p~n", [self(), Msg, State]).
 
+%% 处理异步版本的函数
+idle({ask_negotiate, OtherPid}, S = #state{}) ->
+	Ref = erlang:monitor(process, OtherPid),
+	notice(S, "~p asked for a trade negotiation", [OtherPid]),
+	{next_state, idle_wait, S#state{other = OtherPid, monitor = Ref}};
+idle(Event, Data) ->
+	unexpected(Event, idle),
+	{next_state, idle, Data}.
 
 
 
