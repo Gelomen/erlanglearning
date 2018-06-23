@@ -132,7 +132,7 @@ idle_wait(Event, Data) ->
 	{next_state, idle_wait, Data}.
 
 %% ------ 自己 FSM 收到对方 ask_negotiate 消息后会转为 idle_wait 状态
-%%        所以是在 idle_wait 状态下接收对方的交易请求
+%%        所以是在 idle_wait 状态下接收对方的接受交易请求
 
 idle_wait(accept_negotiate, _From, S = #state{other = OtherPid}) ->
 	accept_negotiate(OtherPid, self()),
