@@ -96,7 +96,7 @@ terminate(_Reason, _State) ->
 %% ============================================================================
 
 handle_down_worker(Ref, S = #state{limit = L, sup = Sup, refs = Refs}) ->
-    case queue:out(#state.queue) of
+    case queue:out(S#state.queue) of
         {{value, {From, Args}}, Q} ->
             {ok, Pid} = supervisor:start_child(Sup, Args),
             NewRef = erlang:monitor(process, Pid),
